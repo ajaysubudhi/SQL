@@ -12,10 +12,12 @@ Each row of this table contains information about the salary of an employee.
 
 Write a solution to find the second highest salary from the Employee table. If there is no second highest salary, return null (return None in Pandas).
 */
+
+--ANSWER--
 /* Write your PL/SQL query statement below */
 Select 
-CASE WHEN reff1.RNK=2 THEN reff1.salary 
-     ELSE Null END AS SecondHighestSalary FROM 
+max(CASE WHEN reff1.RNK=2 THEN reff1.salary 
+     ELSE Null END) AS SecondHighestSalary FROM 
 (
 Select reff.salary,reff.RNK,
   LEAD(reff.RNK) OVER (ORDER BY reff.RNK) AS next_rank,
@@ -25,7 +27,8 @@ from
     (
     Select
         salary,
-        RANK() OVER (ORDER BY salary DESC ) AS RNK
+        DENSE_RANK() OVER (ORDER BY salary DESC ) AS RNK
     FROM Employee ) reff
 )reff1
-WHERE reff1.RNK=2 OR (reff1.next_rank is null AND reff1.prev_rank is null);
+WHERE reff1.RNK=2 OR (reff1.next_rank is null AND reff1.prev_rank is null OR reff1.prev_rank=1) group by 1
+;
